@@ -14,12 +14,11 @@ router
   .get(wrapAsync(listingController.index))
   .post(
     isLoggedIn,
-    
     upload.single("listing[image]"),
     validateListing,
     wrapAsync(listingController.createListings)
   );
- 
+
 
 //new
 router.get("/new", isLoggedIn, listingController.renderNewForm);
@@ -30,6 +29,7 @@ router
   .put(
     isLoggedIn,
     isOwner,
+    upload.single("listing[image]"),
     validateListing,
     wrapAsync(listingController.updateListing)
   )
