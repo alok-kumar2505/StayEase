@@ -1,6 +1,6 @@
 {
   "engines":{
-    "node":"24.6.0",
+    "node":"24.6.0"
   },
   "name": "StayEase project",
   "version": "1.0.0",
