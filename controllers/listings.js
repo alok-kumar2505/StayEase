@@ -40,7 +40,6 @@ module.exports.createListings = async (req, res, next) => {
   newListing.geometry= coOrdinates.body.features[0].geometry;
 
   let savedlisting=await newListing.save();
-  console.log(savedlisting);
   req.flash("success", "New Listing Added!");
   res.redirect("/listings");
 };
@@ -74,7 +73,6 @@ module.exports.updateListing = async (req, res) => {
 module.exports.deleteRoute = async (req, res) => {
   let { id } = req.params;
   let deletedval = await Listing.findByIdAndDelete(id);
-  console.log(deletedval);
   req.flash("success", "Listing Deleted!");
   res.redirect("/listings");
 };

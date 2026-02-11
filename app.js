@@ -47,9 +47,9 @@ app.use(express.static(path.join(__dirname, "/public"))); //path set for public 
 
 
 
-// app.get("/", (req, res) => {
-//     res.send("root is working");
-// })
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
 
 const store= MongoStore.create({
     mongoUrl:dbUrl,
@@ -90,16 +90,6 @@ app.use((req,res,next)=>{
     res.locals.error=req.flash("error");
     res.locals.currUser=req.user;
     next();
-})
-
-app.get("/demouser",async(req,res)=>{
-    let fakeUser=new User({
-        email:"abc@gmail.com",
-        username:"demouser",
-    })
-
-    let registerUser=await User.register(fakeUser,"abcd");
-    res.send(registerUser);
 })
 
 
