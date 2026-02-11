@@ -27,14 +27,19 @@ const userRouter=require("./routes/user.js");
 const dbUrl=process.env.ATLASDB_URL;
 
 main().then(() => {
-    console.log("connected to DB");
+    console.log("Connected to MongoDB Atlas");
 })
     .catch((err) => {
-        console.log(err);
+        process.exit(1);
     });
 
 async function main() {
-    await mongoose.connect(dbUrl);
+    await mongoose.connect(dbUrl, {
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 30000,
+        retryWrites: true,
+        w: "majority"
+    });
 }
 
 app.set("view engine", "ejs");
