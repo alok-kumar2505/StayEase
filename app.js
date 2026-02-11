@@ -27,18 +27,22 @@ const userRouter=require("./routes/user.js");
 const dbUrl=process.env.ATLASDB_URL;
 
 main().then(() => {
-    console.log("Connected to MongoDB Atlas");
+    console.log("Connected to MongoDB Atlas", mongoose.connection.name);
 })
     .catch((err) => {
         process.exit(1);
     });
+
+
 
 async function main() {
     await mongoose.connect(dbUrl, {
         serverSelectionTimeoutMS: 30000,
         socketTimeoutMS: 30000,
         retryWrites: true,
-        w: "majority"
+        w: "majority",
+        ssl: true,
+        authSource: "admin"
     });
 }
 
@@ -67,6 +71,7 @@ store.on("error", () =>{
 console. log ("ERROR in MONGO SESSION STORE", err);
 })
 
+
 const sessionOptions={
     store,
     secret:process.env.SECRET,
@@ -89,11 +94,11 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
+// Middleware to set locals - MUST BE BEFORE ROUTES
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
-    res.locals.currUser=req.user;
+    res.locals.currUser=req.user || null;  // Ensure currUser is always defined
     next();
 })
 
@@ -109,10 +114,12 @@ app.use("*", (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-     console.error("🔥 ERROR DETAILS:", err); 
     let { statusCode = 500, message = "Something went Wrong" } = err;
-    // res.status(statusCode).send(message);
-    res.status(statusCode).render("error.ejs", { message })
+    // Ensure locals are set even in error
+    res.locals.currUser = res.locals.currUser || null;
+    res.locals.success = res.locals.success || [];
+    res.locals.error = res.locals.error || [];
+    res.status(statusCode).render("error.ejs", { message, statusCode, currUser: res.locals.currUser })
 })
 
 app.listen(8080, () => {
